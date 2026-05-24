@@ -1,4 +1,4 @@
-package com.example.eccogui;
+
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -7,15 +7,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.IOException;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
-import javafx.geometry.Insets;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 
 public class Grid extends Application
@@ -63,7 +58,7 @@ public class Grid extends Application
         simulation.getChildren().add(simula);
         simulation.setAlignment(Pos.BOTTOM_RIGHT);
 
-        root.setCenter(this.board.get_grid());
+        root.setCenter(this.board.getGrid());
         root.setBottom(organisms);
         root.setLeft(day);
         root.setRight(simulation);
@@ -121,9 +116,10 @@ public class Grid extends Application
     {
         this.day_number++;
         this.day_label.setText("Day: " + this.day_number);
-        run();
-        this.board.from_board_to_grid();
-        this.root.setCenter(this.board.get_grid());
+
+        this.board.simulateDay();
+        this.board.fromBoardToGrid();
+        this.root.setCenter(this.board.getGrid());
     }
 
     // when new simulation button is clicked, so we will check if next-day button is disable,
@@ -137,18 +133,18 @@ public class Grid extends Application
             int num_carnivores = Integer.parseInt(this.carnivores_field.getText());
             int num_herbivores = Integer.parseInt(this.herbivores_field.getText());
             int num_plants = Integer.parseInt(this.plants_field.getText());
-            this.board.reset_cell_grid();
+            this.board.resetCellGrid();
             this.board.resetBoard();
             this.board.placeOrganisms(num_carnivores, num_herbivores, num_plants);
             this.board.printBoard();
-            this.board.from_board_to_grid();
-            this.root.setCenter(this.board.get_grid());
+            this.board.fromBoardToGrid();
+            this.root.setCenter(this.board.getGrid());
         }
         else
         {
-            this.board.reset_cell_grid();
+            this.board.resetCellGrid();
             this.board.resetBoard();
-            this.root.setCenter(this.board.get_grid());
+            this.root.setCenter(this.board.getGrid());
             this.carnivores_field.setText("0");
             this.herbivores_field.setText("0");
             this.plants_field.setText("0");
@@ -158,51 +154,8 @@ public class Grid extends Application
         }
     }
 
-    // same function from the previous assignment, (except the number of days).
-    // the function called from next_day() function
-    public void run()
-    {
-        //reset the board
-        this.board.reset_moves();
-        this.board.reset_eats();
-        for (int r = 0; r < this.board.get_rows(); r++)  // going over the board cells
-        {
-            for (int c = 0; c < this.board.get_cols(); c++)
-            {
-
-                Organism organism = this.board.get_organism_array()[r][c];
-                // if the cell contain on organism, so we check.
-                if (organism != null)
-                {
-                    if (organism.get_name() == 'H' || organism.get_name() == 'C')
-                    {
-                        if (!((Animal)organism).if_move_today && organism.get_energy() <= 0)  //if the organism is dead and didnt move today
-                        {
-                            Organism.set_count();    // update the number of organism in the board
-                            this.board.get_organism_array()[r][c] = null;
-                            continue;
-                        }
-                        else
-                        {
-                            Animal animal = (Animal) organism;
-                            Point p = new Point(r, c);   //current point
-                            animal.eat(p);      //check if the animal can eat
-                            animal.move(animal.direction);
-                        }
-                    }
-                    if (organism.get_name() == 'P')   //  plants gain 10 energy each day
-                        organism.set_energy(10);
-                }
-            }
-        }
-        System.out.println("new day");
-        board.printBoard();
-
-    }
-
    public static void main(String[] args)
    {
         launch();
    }
-
 }
